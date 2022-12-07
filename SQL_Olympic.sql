@@ -1,11 +1,10 @@
 
-
-
-
 select *
 from SQL_Portfolio.dbo.noc_regions
 select *
 from SQL_Portfolio.dbo.athlete_events
+
+
 
 --1.How many olympics games have been held?
 
