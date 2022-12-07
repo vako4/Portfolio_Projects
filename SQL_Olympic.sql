@@ -1,3 +1,7 @@
+
+
+
+
 select *
 from SQL_Portfolio.dbo.noc_regions
 select *
