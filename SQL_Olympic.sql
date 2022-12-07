@@ -1,5 +1,5 @@
 
---https://github.com/vako4/DataSets/blob/main/Olympic.xlsx Dataset
+--https://github.com/vako4/DataSets/blob/main/Olympic.xlsx - Dataset
 
 select *
 from SQL_Portfolio.dbo.noc_regions
