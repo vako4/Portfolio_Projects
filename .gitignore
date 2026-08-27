@@ -1,0 +1,24 @@
+# Environment
+.env
+
+# Python
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data
+data/
+*.xlsx
+*.csv
+
+# Power BI
+*.pbix
+*.pbix.bak
+.pbi/
+~$*.pbix
+
+# Pipeline runtime artifacts
+_tmp/
+_executed/

@@ -10,14 +10,13 @@ load_dotenv()
 
 
 # Private banking HR codes — clients excluded from several PORTS queries.
-# This list comes from the original PORTS.ipynb Cell 2.
 PB_HR_CODES = [
-    'C1284', 'C1285', 'A0033', 'A0361', 'A0362', 'B0874',
-    'B7134', 'C1072', 'C0109', 'C5053', 'C7582',
+    'X2001', 'X2002', 'X2003', 'X2004', 'X2005', 'X2006',
+    'X2007', 'X2008', 'X2009', 'X2010', 'X2011',
 ]
 
 # Comma-separated single-quoted form for SQL `IN (...)` clauses.
-# Example: 'C1284', 'C1285', 'A0033', ...
+# Example: 'X2001', 'X2002', 'X2003', ...
 PB_DF_SQL = ', '.join(f"'{code}'" for code in PB_HR_CODES)
 
 

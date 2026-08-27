@@ -25,13 +25,13 @@ from ports_utils import compute_dates
 # - sql_product_literal:    what the notebook's SQL returns in the PRODUCT column
 # - pivot_column_name:      name of the column in the final pivoted output
 PRODUCTS = [
-    ('deposits'          , 'PORT_DEPOS'                  , 'PORT_DEPOS'),
-    ('loans'             , 'PORT_LOANS'                  , 'PORT_LOANS'),
-    ('soc_loans'         , 'SOC_LOANS'                   , 'SOC_LOAN'),
-    ('soc_ovd'           , 'SOC_OVD'                     , 'SOC_OVD'),
-    ('collateral'        , 'PORT_COLLOTERAL_LOANS'       , 'PORT_COLLOTERAL_LOANS'),
-    ('mortgage'          , 'MORTGAGE_LOANS'              , 'MORTGAGE_LOANS'),
-    ('savings'           , 'Saiving_Meti_portfolio'      , 'Saiving_Meti_portfolio'),
+    ('product_a'         , 'PRODUCT_A'                   , 'PRODUCT_A'),
+    ('loans'             , 'PRODUCT_B'                   , 'PRODUCT_B'),
+    ('product_c'         , 'PRODUCT_C'                   , 'PRODUCT_C'),
+    ('product_d'         , 'PRODUCT_D'                   , 'PRODUCT_D'),
+    ('product_e'         , 'PRODUCT_E'                   , 'PRODUCT_E'),
+    ('product_f'         , 'PRODUCT_F'                   , 'PRODUCT_F'),
+    ('product_g'         , 'PRODUCT_G'                   , 'PRODUCT_G'),
 ]
 
 
@@ -97,10 +97,10 @@ def main():
             combined_df['PRODUCT'] == sql_literal
         ).astype(int)
 
-    # TOTAL = SOC_LOAN + SOC_OVD + PORT_LOANS  (original behavior — NOT all products)
-    combined_df['TOTAL'] = (combined_df['SOC_LOAN']
-                            + combined_df['SOC_OVD']
-                            + combined_df['PORT_LOANS'])
+    # TOTAL sums a specific 3-of-7 product subset — a deliberate business rule
+    combined_df['TOTAL'] = (combined_df['PRODUCT_C']
+                            + combined_df['PRODUCT_D']
+                            + combined_df['PRODUCT_B'])
 
     # --- Group by POS_ID, sum each column ---
     agg_cols = [pivot_col for _, _, pivot_col in PRODUCTS] + ['TOTAL']
