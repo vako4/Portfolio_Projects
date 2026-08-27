@@ -1,0 +1,7 @@
+.env
+__pycache__/
+*.pyc
+_tmp/
+_executed/
+PORT.xlsx
+.ipynb_checkpoints/
