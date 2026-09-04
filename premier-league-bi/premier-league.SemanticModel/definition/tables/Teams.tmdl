@@ -1,0 +1,26 @@
+table Teams
+	lineageTag: 6b4beef3-b8fe-42fa-9ba1-82d1a9c57d74
+
+	column Team
+		dataType: string
+		lineageTag: 187af70a-ba44-4013-a868-dba1c8e416de
+		summarizeBy: none
+		sourceColumn: Team
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Teams = m
+		mode: import
+		source =
+				let
+				    Source = Table.Distinct(Table.SelectColumns(Team_Matches, {"Team"})),
+				    Sorted = Table.Sort(Source, {{"Team", Order.Ascending}})
+				in
+				    Sorted
+
+	changedProperty = Name
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

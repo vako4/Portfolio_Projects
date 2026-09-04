@@ -1,0 +1,25 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["Matches","Team_Matches","Teams","Seasons","_Measures"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table Matches
+ref table DateTableTemplate_a14dc902-cbc5-4606-84b3-103391dc9580
+ref table LocalDateTable_f5eb13b9-5ec5-465c-8223-ac32ef7f6da8
+ref table Team_Matches
+ref table LocalDateTable_991cae14-e277-4b60-8b7d-3a19f33116e4
+ref table Teams
+ref table Seasons
+ref table _Measures
+
+ref cultureInfo en-US
+

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
+  "name": "d307c95b50db6c84252c",
+  "displayName": "Home Advantage",
+  "displayOption": "FitToPage",
+  "height": 720,
+  "width": 1280,
+  "pageBinding": {
+    "name": "902a2ab961a901800400",
+    "type": "Default",
+    "parameters": []
+  }
+}

@@ -19,6 +19,9 @@ data/
 .pbi/
 ~$*.pbix
 
+# ...except the premier-league-bi portfolio project, which tracks its .pbix
+!premier-league-bi/*.pbix
+
 # Pipeline runtime artifacts
 _tmp/
 _executed/

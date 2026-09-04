@@ -1,0 +1,37 @@
+table Seasons
+	lineageTag: 394c77d7-b2c7-47f2-a3cc-784e50208249
+
+	column SeasonLabel
+		dataType: string
+		lineageTag: 96c74558-c198-4530-a6b0-2cb25b0a16c9
+		summarizeBy: none
+		sourceColumn: SeasonLabel
+
+		annotation SummarizationSetBy = Automatic
+
+	column Season
+		dataType: string
+		lineageTag: 9fdd3570-a054-4f0f-9319-12a3caccee18
+		summarizeBy: none
+		sourceColumn: Season
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Seasons = m
+		mode: import
+		source = ```
+				let
+				    Source = Table.Distinct(Table.SelectColumns(Matches, {"Season"})),
+				    ToText = Table.TransformColumnTypes(Source, {{"Season", type text}}),
+				    AddLabel = Table.AddColumn(ToText, "SeasonLabel", each 
+				        "20" & Text.Start([Season], 2) & "/" & Text.End([Season], 2), type text),
+				    Sorted = Table.Sort(AddLabel, {{"Season", Order.Ascending}}),
+				    #"Renamed Columns" = Table.RenameColumns(Sorted,{{"SeasonLabel", "Season"}, {"Season", "SeasonLabel"}})
+				in
+				    #"Renamed Columns"
+				```
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
