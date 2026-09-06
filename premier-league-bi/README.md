@@ -1,31 +1,28 @@
 # Premier League Analytics
 
-A Power BI dashboard answering three related questions about the English Premier
-League: how has each team performed across a season (points, goals, form), how
-much of that performance is a home-field effect rather than team quality, and how
-did a team's results trend week to week within a season. Eleven seasons (2015/16
-through 2025/26) are covered, sourced from published match-by-match results.
+A Power BI dashboard answering two related questions about the English Premier
+League: how has each team performed across a season (points, goals, goal
+difference), and how much of that performance is a home-field effect rather than
+team quality. Eleven seasons (2015/16 through 2025/26) are covered, sourced from
+published match-by-match results.
 
 ## Screenshots
 
 ### League Overview
 ![League Overview](screenshots/league-overview.png)
-Season-level standings table (matches played, goals for/against, goal difference,
-points) next to a ranked bar chart of total points by team — the classic league
-table view, filterable by season.
+A season-filterable standings table (matches played, goals for/against, goal
+difference, points), three KPI cards (total goals, the season's champion, and
+goals per match), and a "Goals Scored vs Conceded" scatter of every team with
+dashed reference lines marking the league-average goals for and against — teams
+in the lower-right are outscoring and out-defending the league average.
 
 ### Home Advantage
 ![Home Advantage](screenshots/home-advantage.png)
-Two views of the same idea: a scatter of away points-per-game vs. home
-points-per-game per team (teams above the diagonal do better at home), and a
-diverging bar chart of each team's `Home Advantage` measure, sorted from largest
-home boost to largest away-from-home edge.
-
-### Form Over Time
-![Form Over Time](screenshots/form-over-time.png)
-A rolling 5-match points total per team, plotted by match number within the
-season, with a team-tile slicer for picking which teams to compare — shows
-whether a team's form is trending up or down independent of season-long totals.
+A "Home vs Away Form" scatter of away points-per-game vs. home points-per-game
+per team (teams above the diagonal do better at home), next to a "Home Advantage
+by Team" bar chart sorted from largest home boost to largest away-from-home edge,
+with negative bars (teams that do better away) coloured red against the default
+navy.
 
 ## Data model
 
@@ -40,9 +37,9 @@ fouls (`HF`/`AF`), corners (`HC`/`AC`), cards (`HY`/`AY`/`HR`/`AR`), and `Season
 perspective and an away perspective and stacking them, tagging each with
 `IsHome`. This is what makes "home vs. away" and "per-team" measures possible
 without row-level DAX gymnastics. Adds `Result` (W/D/L) and `Points` (3/1/0), plus
-two calculated columns used for the rolling-form measure: `Match Number` (dense
-rank of a team's matches by date, across all seasons) and `Match Number In Season`
-(same, restarted each season).
+two calculated columns for match sequencing: `Match Number` (dense rank of a
+team's matches by date, across all seasons) and `Match Number In Season` (same,
+restarted each season).
 
 **Teams** — one row per team, the distinct `Team` values from `Team_Matches`.
 
@@ -89,9 +86,48 @@ Total Goals (League)  = SUM(Matches[FTHG]) + SUM(Matches[FTAG])
 Goals Per Match        = DIVIDE([Total Goals (League)], [Total Matches])
 ```
 
-The rest are worth walking through, because the payoff of the `Team_Matches`
-unpivot shows up here — a "home" or "away" filter is just a `WHERE` clause on
-`IsHome`, not a self-join:
+The rest are worth walking through. First, the four measures behind the League
+Overview page's KPI cards and scatter reference lines:
+
+```dax
+Total Goals = FORMAT([Total Goals (League)], "#,0")
+```
+A pure display wrapper, not a new calculation — `[Total Goals (League)]` already
+holds the number. The KPI card needed a comma-thousands-separated value
+(`"1,115"`), and `FORMAT()` was used to produce that as text rather than relying
+on the visual's own number formatting. The tradeoff: because `FORMAT()` returns
+text, this measure can't be reused in further arithmetic the way a numeric
+measure could.
+
+```dax
+Champion =
+CALCULATE(
+    SELECTEDVALUE(Teams[Team]),
+    TOPN(1, ALLSELECTED(Teams), [Total Points], DESC)
+)
+```
+This is a "top-N as a scalar" pattern. `TOPN(1, ALLSELECTED(Teams), [Total
+Points], DESC)` ranks every team (ignoring any single-team highlight from
+clicking a data point elsewhere, but still respecting the season slicer via
+`ALLSELECTED`) and keeps only the top one by points. `CALCULATE` then applies
+that one-row table as filter context, so `SELECTEDVALUE(Teams[Team])` — which
+would normally return blank or an error across multiple teams — resolves
+cleanly to a single name, because the filter context now contains exactly one
+team.
+
+```dax
+Avg Goals For = AVERAGEX(ALLSELECTED(Teams), [Total Goals For])
+Avg Goals Against = AVERAGEX(ALLSELECTED(Teams), [Total Goals Against])
+```
+These drive the scatter chart's reference lines. `ALLSELECTED(Teams)` is doing
+the same job as in `Champion`: it keeps the season slicer's filter but ignores
+per-team cross-highlighting, so clicking one team's dot on the scatter doesn't
+drag the average line to that team's own value — the reference lines stay fixed
+at "the league average for the selected season" regardless of what's clicked.
+
+Then the measures behind the Home Advantage page, where the payoff of the
+`Team_Matches` unpivot shows up — a "home" or "away" filter is just a `WHERE`
+clause on `IsHome`, not a self-join:
 
 ```dax
 Home Points = CALCULATE([Total Points], Team_Matches[IsHome] = TRUE())
@@ -143,19 +179,28 @@ CALCULATE(
     )
 )
 ```
-This is the measure behind the "Form Over Time" line chart, and it's the one
-place in the model doing a real window reset. The line chart's visual context for
-a given point is just "this team, this match" — on its own that would return a
-single match's points, not a trailing sum. The three `VAR`s capture that point's
-team, season, and match-number *before* the filter context is touched. Then
-`ALL(Team_Matches)` clears the existing filter context entirely (otherwise the
-chart's own per-point context would still be layered on top and the `FILTER`
-would have nothing to widen), and the `FILTER` rebuilds a window by hand: same
-team, same season, and a match-number range of `(CurrentMatchNum - 5,
-CurrentMatchNum]` — the trailing 5 matches, inclusive of the current one. Season
-is included in the match so form doesn't carry over across a summer break, and
-`Match Number In Season` (rather than `Date`) is the axis so the window is
-"5 matches back" regardless of gaps between fixtures.
+This one does a real window reset. Its filter context for a given row is just
+"this team, this match" — on its own that would return a single match's points,
+not a trailing sum. The three `VAR`s capture that row's team, season, and
+match-number *before* the filter context is touched. Then `ALL(Team_Matches)`
+clears the existing filter context entirely, and the `FILTER` rebuilds a window
+by hand: same team, same season, and a match-number range of `(CurrentMatchNum
+- 5, CurrentMatchNum]` — the trailing 5 matches, inclusive of the current one.
+
+`Team_Matches[Season]` is deliberately part of that filter, not an afterthought.
+Without it, the window would be keyed on `Match Number` (the dense rank across
+*all* seasons) or would let a `Match Number In Season` window slide past
+match 1 into the previous season's final matches — e.g. a team's 2nd match of
+a new season would pull in 3 matches from the season before to fill out a
+"last 5," blending form across a summer transfer window and promotion/relegation
+as if nothing happened. Filtering on season as well as match number keeps each
+season's form calculation self-contained, at the cost of the first 4 matches of
+every season having a shorter-than-5 window (there's nothing earlier in that
+season to borrow from).
+
+This measure is currently defined in the model but not bound to any visual on
+either report page — it was built for a "Form Over Time" line chart that's since
+been removed.
 
 ## How to run
 

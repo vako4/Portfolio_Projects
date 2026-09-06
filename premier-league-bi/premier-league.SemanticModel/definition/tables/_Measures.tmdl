@@ -93,6 +93,31 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	measure 'Total Goals' = FORMAT([Total Goals (League)], "#,0")
+		lineageTag: a97f9588-936a-45c5-82b2-d1ad554f383e
+
+	measure Champion =
+			
+			CALCULATE(
+			    SELECTEDVALUE(Teams[Team]),
+			    TOPN(1, ALLSELECTED(Teams), [Total Points], DESC)
+			)
+		lineageTag: 4ed6b87c-16c7-4189-af00-9c85de68e247
+
+	measure 'Avg Goals For' =
+			
+			AVERAGEX(ALLSELECTED(Teams), [Total Goals For])
+		lineageTag: 252fcc17-09e4-4a36-8767-38e947056d49
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg Goals Against' =
+			
+			AVERAGEX(ALLSELECTED(Teams), [Total Goals Against])
+		lineageTag: 88cf6c47-32de-4c91-ac22-b5bdd17c683b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	partition _Measures = m
 		mode: import
 		source =

@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
   "name": "449fa669609033e22378",
   "position": {
-    "x": 659.452887537994,
-    "y": 34.042553191489361,
+    "x": 664.5454545454545,
+    "y": 74.545454545454533,
     "z": 2000,
-    "height": 199.39209726443769,
-    "width": 620.54711246200611,
+    "height": 219.99999999999997,
+    "width": 615.45454545454538,
     "tabOrder": 2000
   },
   "visual": {
@@ -23,12 +23,11 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Total Goals (League)"
+                  "Property": "Total Goals"
                 }
               },
-              "queryRef": "_Measures.Total Goals (League)",
-              "nativeQueryRef": "Total Goals (League)",
-              "format": "#,0"
+              "queryRef": "_Measures.Total Goals Display",
+              "nativeQueryRef": "Total Goals"
             },
             {
               "field": {
@@ -38,11 +37,11 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Total Matches"
+                  "Property": "Champion"
                 }
               },
-              "queryRef": "_Measures.Total Matches",
-              "nativeQueryRef": "Total Matches"
+              "queryRef": "_Measures.Champion",
+              "nativeQueryRef": "Champion"
             },
             {
               "field": {
@@ -71,10 +70,10 @@
                     "Entity": "_Measures"
                   }
                 },
-                "Property": "Total Goals (League)"
+                "Property": "Total Goals"
               }
             },
-            "direction": "Descending"
+            "direction": "Ascending"
           }
         ],
         "isDefaultSort": true
@@ -127,6 +126,22 @@
               "expr": {
                 "Literal": {
                   "Value": "true"
+                }
+              }
+            }
+          },
+          "selector": {
+            "id": "default"
+          }
+        }
+      ],
+      "value": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "20D"
                 }
               }
             }
